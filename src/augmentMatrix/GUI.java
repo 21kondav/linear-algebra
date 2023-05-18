@@ -108,7 +108,7 @@ public class GUI extends Application implements UI {
 		stage.setScene(new Scene(addVarsContainer));
 		return new AugmentedArray(initArr);
 	}
-
+	//FIXME:
 	@Override
 	public AugmentedArray enterCoefficients(AugmentedArray aug) {
 		// TODO Auto-generated method stub
