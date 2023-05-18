@@ -1,8 +1,11 @@
 package augmentMatrix;
 
+import java.util.Arrays;
+
 public class AugmentedArray {
 
-	private double[][] coefficients = null;
+
+	private String[] coefficients = null;
 	private double[] constants = null;
 	private String[] variables = null;
 
@@ -14,12 +17,16 @@ public class AugmentedArray {
 	 * @see Au
 	 */
 	public AugmentedArray(int numeqn, int numvar) {
-		coefficients = new double[numeqn][numvar];
-
+		//builds arrays for the coefficients, variables and constants
+		String row = "";
+		for(int i = 0; i < numvar; i++) row+="* ";
+		coefficients = new String[numeqn];
+		Arrays.fill(coefficients, row);
+		
 		variables = new String[numvar];
 		constants = new double[numeqn];
 	}
-
+//Copy constructor
 	public AugmentedArray(AugmentedArray other) {
 		coefficients = other.coefficients.clone();
 		variables = other.variables.clone();
@@ -31,9 +38,11 @@ public class AugmentedArray {
 			System.err.println("Index out of bounds!");
 			return;
 		}
-		coefficients[row][col] = value;
+		//new implementation
+		String[] theRow = coefficients[row].split(" ");
+		theRow[col] = String.valueOf(value);
+		coefficients[row] = String.join(" ", theRow);
 	}
-
 	public void initializeVariable(String variable, int col) {
 		if (col < 0 || col >= getNumberOfVariables()) {
 			System.err.println("Index out of bounds!");
@@ -51,11 +60,12 @@ public class AugmentedArray {
 	}
 
 	public double getCoefficient(int i, int j) {
-		if (i < 0 || i >= getNumberOfEquations() || j < 0 || j >= getNumberOfVariables()) {
+		try {
+			return Double.parseDouble(coefficients[i].split(" ")[j]);
+		}catch(Exception IndexOutOfBounds) {
 			System.err.println("Index out of bounds!");
 			return 0.0;
-		}
-		return coefficients[i][j];
+		}	
 	}
 
 	public int getNumberOfEquations() {
@@ -65,47 +75,72 @@ public class AugmentedArray {
 	public int getNumberOfVariables() {
 		return variables.length;
 	}
-
-	public AugmentedArray swapRows(int row1, int row2) {
+	//EDIT: Static method to convert double arrays to single arrays method
+	public static String[] convertToOneD(double[][] matrix) {
+		
+		String[] arr = new String[matrix.length];
+		for(int k = 0; k < matrix.length; k++) {
+			double[] row = matrix[k];
+			String currentRow = "";
+			for(double i: row) {
+				currentRow += i +" ";
+			}
+			arr[k] = currentRow;
+		}
+		return arr;
+	}
+	//EDIT: Static method to Convert from one dimention to two dimenional array
+	public static double[][] convertToTwoD(String[] oneDim) {
+		double[][] twoDim = new double[oneDim[0].length()][oneDim.length];
+		for(int i =0; i < oneDim.length; i++) {
+			String[] current = oneDim[i].split(" ");
+			for(int j = 0; j < current.length; j++) {
+				twoDim[i][j] = Double.parseDouble(current[j]);
+			}
+		}
+		return twoDim;
+	}
+/*
+ * TODO: Change the follow methods to work with single string arrays
+ * swapRows(int, int): AugmentedArray
+ * swapColumns(int, int): AugmentedArray
+ * multiplyToArray(double, int): Augmented Array
+ * multiplyAndAddToArray(double, int): Augmented Array
+ * toString(): String
+*/
+	public AugmentedArray swapRows(int rowOne, int rowTwo) {
 		AugmentedArray temp = new AugmentedArray(this);
 		try {
-			row1--;
-			row2--;
-			if (row1 < 0 || row2 < 0 || row1 >= coefficients.length || row2 >= coefficients.length) {
-				throw new IllegalArgumentException("Row cannot be less than zero");
-			}
-			for (int i = 0; i < variables.length; i++) {
-				double var = temp.coefficients[row1][i];
-				temp.coefficients[row1][i] = temp.coefficients[row2][i];
-				temp.coefficients[row2][i] = var;
-			}
-
-			double var = temp.constants[row1];
-			temp.constants[row1] = temp.constants[row2];
-			temp.constants[row2] = var;
+			rowOne--;
+			rowTwo--;
+			//TODO: Make sure this works before implementing generally
+			String tempString = coefficients[rowOne];
+			coefficients[rowOne] = coefficients[rowTwo];
+			coefficients[rowTwo] = tempString;
+			temp.coefficients = coefficients;
 		} catch (ArrayIndexOutOfBoundsException e) {
 			System.err.println("Index out of bounds! Retry...");
 		}
 		return temp;
 	}
 
-	public AugmentedArray swapColumns(int column1, int column2) {
+	public AugmentedArray swapColumns(int columnOne, int columnTwo) {
 		AugmentedArray temp = new AugmentedArray(this);
 		try {
-			column1--;
-			column2--;
-			if (column1 < 0 || column2 < 0 || column1 >= variables.length || column2 >= variables.length) {
-				System.err.println("Column index out of bounds!");
-				return this;
-			}
+			columnOne--;
+			columnTwo--;
+
 			for (int i = 0; i < constants.length; i++) {
-				double var = temp.coefficients[i][column1];
-				temp.coefficients[i][column1] = temp.coefficients[i][column2];
-				temp.coefficients[i][column2] = var;
+				String[] row = temp.coefficients[i].split(" ");
+				String val = row[columnOne];
+				row[columnOne] = row[columnTwo];
+				row[columnTwo] = val;
+				temp.coefficients[i] = String.join(" ", row);
+				
 			}
-			String var = temp.variables[column1];
-			temp.variables[column1] = temp.variables[column2];
-			temp.variables[column2] = var;
+			String var = temp.variables[columnOne];
+			temp.variables[columnOne] = temp.variables[columnTwo];
+			temp.variables[columnTwo] = var;
 		} catch (ArrayIndexOutOfBoundsException e) {
 			System.err.println("Index out of bounds! Retry...");
 		}
@@ -113,24 +148,22 @@ public class AugmentedArray {
 
 	}
 
-	public AugmentedArray multiplyToArray(double multiplier, int rowindex) {
-		rowindex--;
+	public AugmentedArray multiplyToArray(double multiplier, int rowIndex) {
+		rowIndex--;
 		AugmentedArray temp = new AugmentedArray(this);
 
 		try {
-			if (rowindex < 0 || rowindex >= getNumberOfEquations()) {
-				System.err.println("Row index out of bounds!");
-				return this;
-			}
-
 			if (multiplier == 0) {
 				System.err.println("Cannot multiply by 0!");
 				return this;
 			}
-			for (int i = 0; i < coefficients[rowindex].length; i++) {
-				temp.coefficients[rowindex][i] *= multiplier;
+			String[] row = temp.coefficients[rowIndex].split(" ");
+			for (int i = 0; i < row.length; i++) {
+				row[i]= String.valueOf(Double.parseDouble(row[i]) * multiplier)+" ";
 			}
-			temp.constants[rowindex] *= multiplier;
+			
+			temp.coefficients[rowIndex] = String.join(" ", row);
+			temp.constants[rowIndex] *= multiplier;
 			return temp;
 		} catch (ArrayIndexOutOfBoundsException e) {
 			System.err.println("Index out of bounds! Retry...");
@@ -144,17 +177,14 @@ public class AugmentedArray {
 		AugmentedArray temp = new AugmentedArray(this);
 
 		try {
-			if (srcindex < 0 || dstindex < 0 || srcindex >= getNumberOfEquations()
-					|| srcindex >= getNumberOfEquations()) {
-				System.err.println("Row index out of bounds!");
-				return this;
-			}
 			if (multiplier == 0) {
 				System.err.println("Cannot multiply by 0!");
 				return this;
 			}
-			for (int i = 0; i < coefficients[srcindex].length; i++) {
-				temp.coefficients[dstindex][i] += multiplier * temp.coefficients[srcindex][i];
+			for (int i = 0; i < coefficients[srcindex].length(); i++) {
+				String[] row = temp.coefficients[dstindex].split(" ");
+				row[i] = String.valueOf(temp.getCoefficient(dstindex, i) + multiplier * temp.getCoefficient(srcindex, i));
+				temp.coefficients[dstindex] = String.join(" ", row);
 			}
 			temp.constants[dstindex] += multiplier * temp.constants[srcindex];
 			return temp;
@@ -174,9 +204,9 @@ public class AugmentedArray {
 		builder.append("# \n");
 
 		for (int i = 0; i < coefficients.length; i++) {
-			for (int j = 0; j < coefficients[i].length; j++) {
-				builder.append(String.format("%-10.4g", coefficients[i][j]));
-			}
+			String[] row = coefficients[i].split(" ");
+			for(int j = 0; j < row.length; j++)
+				builder.append(String.format("%-10.4s", row[j]));
 			builder.append(String.format("%-10.4g", constants[i]));
 			builder.append("\n");
 		}

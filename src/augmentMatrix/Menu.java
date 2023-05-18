@@ -7,7 +7,7 @@ public enum Menu {
 	printAug("Print Augmented Array"),
 	swapRows("Switch two rows"),
 	swapCol("Switch two Columns"),
-	multiplyRow("Multiply all entries of a row by a nonzero number"),
+	multiplyRow("Multiply row by a nonzero number"),
 	addMultiple("Add a multiple of a row into another row"),
 	exit("Exit");
 	
