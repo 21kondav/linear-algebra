@@ -123,14 +123,14 @@ class CLI implements UI {
 	public AugmentedArray inputSwapRows(AugmentedArray aug) {
 		System.out.print("Enter rows you will like to swap ");
 		try {
-			int value1 = keyboard.nextInt();
-			int value2 = keyboard.nextInt();
-			if (value1 < 1 || value1 > aug.getNumberOfEquations() || value2 < 1
-					|| value2 > aug.getNumberOfEquations()) {
+			int valueOne = keyboard.nextInt();
+			int valueTwo = keyboard.nextInt();
+			if (valueOne < 1 || valueOne > aug.getNumberOfEquations() || valueTwo < 1
+					|| valueTwo > aug.getNumberOfEquations()) {
 				System.err.println("Invalid input! Retry...");
 				return aug;
 			}
-			return aug.swapRows(value1, value2);
+			return aug.swapRows(valueOne, valueTwo);
 		} catch (InputMismatchException e) {
 			System.err.println("Input incorrect! Retry...");
 			if (keyboard.hasNext())
@@ -142,14 +142,14 @@ class CLI implements UI {
 	public AugmentedArray inputSwapColumns(AugmentedArray aug) {
 		System.out.print("Enter columns you will like to swap ");
 		try {
-			int value1 = keyboard.nextInt();
-			int value2 = keyboard.nextInt();
-			if (value1 < 1 || value1 > aug.getNumberOfVariables() || value2 < 1
-					|| value2 > aug.getNumberOfVariables()) {
+			int valueOne = keyboard.nextInt();
+			int valueTwo = keyboard.nextInt();
+			if (valueOne < 1 || valueOne > aug.getNumberOfVariables() || valueTwo < 1
+					|| valueTwo > aug.getNumberOfVariables()) {
 				System.err.println("Invalid input! Retry...");
 				return aug;
 			}
-			return aug.swapColumns(value1, value2);
+			return aug.swapColumns(valueOne, valueTwo);
 		} catch (InputMismatchException e) {
 			System.err.println("Input incorrect! Retry...");
 			if (keyboard.hasNext())

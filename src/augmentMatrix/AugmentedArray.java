@@ -114,10 +114,12 @@ public class AugmentedArray {
 			rowOne--;
 			rowTwo--;
 			//TODO: Make sure this works before implementing generally
-			String tempString = coefficients[rowOne];
-			coefficients[rowOne] = coefficients[rowTwo];
-			coefficients[rowTwo] = tempString;
-			temp.coefficients = coefficients;
+			String tempString = temp.coefficients[rowOne];
+			temp.coefficients[rowOne] = temp.coefficients[rowTwo];
+			temp.coefficients[rowTwo] = tempString;
+			double tempConst = temp.constants[rowOne];
+			temp.constants[rowOne] = temp.constants[rowTwo];
+			temp.constants[rowTwo] = tempConst;
 		} catch (ArrayIndexOutOfBoundsException e) {
 			System.err.println("Index out of bounds! Retry...");
 		}
@@ -159,7 +161,7 @@ public class AugmentedArray {
 			}
 			String[] row = temp.coefficients[rowIndex].split(" ");
 			for (int i = 0; i < row.length; i++) {
-				row[i]= String.valueOf(Double.parseDouble(row[i]) * multiplier)+" ";
+				row[i]= String.valueOf(Double.parseDouble(row[i]) * multiplier)+"";
 			}
 			
 			temp.coefficients[rowIndex] = String.join(" ", row);
@@ -181,7 +183,7 @@ public class AugmentedArray {
 				System.err.println("Cannot multiply by 0!");
 				return this;
 			}
-			for (int i = 0; i < coefficients[srcindex].length(); i++) {
+			for (int i = 0; i < this.getNumberOfVariables(); i++) {
 				String[] row = temp.coefficients[dstindex].split(" ");
 				row[i] = String.valueOf(temp.getCoefficient(dstindex, i) + multiplier * temp.getCoefficient(srcindex, i));
 				temp.coefficients[dstindex] = String.join(" ", row);
